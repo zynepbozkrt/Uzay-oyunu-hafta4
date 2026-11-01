@@ -35,3 +35,11 @@ Testler başarılı oldu.
 - Önbellek bilgisi: `CacheInfo(hits=73, misses=97, maxsize=None, currsize=97)`
 
 **Değerlendirme:** Önbellekli ve önbelleksiz hesaplamalar aynı sonucu verdi. Önbellekli hesaplama bu çalıştırmada yaklaşık 2.666 kat daha hızlıydı. `lru_cache`, daha önce hesaplanan alt problemlerin sonuçlarını saklayarak tekrar hesaplanmalarını önler.
+
+# Python Projesi – Hafta 3, 4 ve 5
+
+**GitHub Proje Bağlantısı:**
+
+https://github.com/zynepbozkrt/Uzay-oyunu-hafta4
+
+Proje dosyaları, Python görevleri ve testler bu depoda bulunmaktadır.
