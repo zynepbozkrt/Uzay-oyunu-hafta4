@@ -3,6 +3,11 @@ from functools import reduce, partial
 from pathlib import Path
 from uzay_oyunu.araclar import hamle_sayaci, en_bagli_gezegenler
 from uzay_oyunu.akis import yakit_gostergesi
+from uzay_oyunu.dekoratorler import log_cagri
+from uzay_oyunu.komutlar import KOMUTLAR 
+from uzay_oyunu.dekoratorler import sinirla
+
+
 def envanter_metni(credits: bool, engines: bool, copilot: bool) -> str:
     esyalar = []
 
@@ -18,6 +23,8 @@ def envanter_metni(credits: bool, engines: bool, copilot: bool) -> str:
 
     return "Sende: " + ", ".join(esyalar)
 
+
+@log_cagri
 def hedef_menusu(hedefler: list[str]) -> str:
     satirlar = ["Nereye gitmek istersin?"]
 
@@ -26,6 +33,8 @@ def hedef_menusu(hedefler: list[str]) -> str:
 
     return "\n".join(satirlar)
 
+
+@log_cagri
 def galaksi_kur(
     gezegenler: list[str],
     baglantilar: dict[str, list[str]],
@@ -43,6 +52,7 @@ def galaksi_kur(
         "yakit": kwargs.get("yakit", 50),
     }
 
+
 def galaksi_yukle() -> dict:
     """Galaksi verilerini JSON dosyasından yükler."""
     dosya_yolu = Path(__file__).with_name("galaksi.json")
@@ -52,10 +62,13 @@ def galaksi_yukle() -> dict:
 
     return galaksi_kur(**veri)
 
+
+
 def travel(hiz: int = 1) -> None:
-  envanter = envanter_metni(True, False, True)
-  if envanter:
-    print(envanter) 
+    envanter = envanter_metni(True, False, True)
+
+    if envanter:
+        print(envanter)
 
     galaksi = galaksi_yukle()
     planet = galaksi["konum"]
@@ -64,6 +77,11 @@ def travel(hiz: int = 1) -> None:
 
     sayac = hamle_sayaci()
     toplam_hamle = 0
+
+    
+    credits = True
+    engines = False
+    copilot = True
 
     while True:
         destinations = galaksi["baglantilar"].get(planet, [])
@@ -80,20 +98,39 @@ def travel(hiz: int = 1) -> None:
         if secim.lower() == "q":
             break
 
+        
+        if secim in KOMUTLAR:
+            durum = {
+                "konum": planet,
+                "baglantilar": galaksi["baglantilar"],
+                "credits": credits,
+                "engines": engines,
+                "copilot": copilot,
+            }
+
+            fonksiyon, aciklama = KOMUTLAR[secim]
+            sonuc = fonksiyon(durum)
+
+            if sonuc is not None:
+                print(sonuc)
+
+            continue
+
+        
         try:
             index = int(secim) - 1
 
             if 0 <= index < len(destinations):
-                try: 
+                try:
                     yakit = next(yakit_akisi)
                 except StopIteration:
                     print("Yakıtın bitti, uzayda sürükleniyorsun...")
                     break
 
-                sayac() 
+                sayac()
                 toplam_hamle += 1
                 planet = destinations[index]
-                
+
                 print(f"Kalan yakıt: {yakit}")
 
                 if yakit == 0:
@@ -108,5 +145,12 @@ def travel(hiz: int = 1) -> None:
     print(f"Oyunu {toplam_hamle} hamlede bitirdin!")
 
 hizli_yolculuk = partial(travel, hiz=3)
+
+
+@sinirla(0, 100)
+def yakit_harca(miktar):
+    """100 birimlik yakıttan belirtilen miktarı harcar."""
+    return 100 - miktar
+
 if __name__ == "__main__":
     travel()
