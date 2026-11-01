@@ -1,5 +1,5 @@
 import json
-from functools import reduce
+from functools import reduce, partial
 from pathlib import Path
 from uzay_oyunu.oyun import travel
 
@@ -44,6 +44,7 @@ def istatistikleri_hesapla(galaksi: dict) -> None:
     print("Toplam bağlantı (reduce):", toplam_reduce)
     print("Toplam bağlantı (sum):", toplam_sum)
 
+hizli_yolculuk = partial (travel, hiz=3)
 
 if __name__ == "__main__":
     istatistikleri_hesapla(galaksi_yukle())
